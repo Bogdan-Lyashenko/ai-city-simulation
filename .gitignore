@@ -1,0 +1,12 @@
+# Dependency directory
+src/client/node_modules
+
+# Remove some common IDE working directories
+.idea
+.DS_STORE
+
+#python
+src/server/py3
+src/server/fs/store
+
+

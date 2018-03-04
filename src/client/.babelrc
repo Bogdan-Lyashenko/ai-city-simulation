@@ -1,0 +1,11 @@
+{
+  "presets": ["latest"],
+  "plugins": [
+      ["babel-plugin-transform-react-jsx", { "pragma": "h" }],
+
+      "babel-plugin-add-module-exports",
+      "transform-es2015-spread",
+      "transform-object-rest-spread",
+      "babel-plugin-transform-es2015-destructuring"
+  ]
+}

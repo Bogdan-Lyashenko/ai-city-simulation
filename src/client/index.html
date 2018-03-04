@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI city: beginning</title>
+    <style>
+        html, body, .stage-container {
+            height: 100%;
+        }
+
+        .stage-container {
+            position: relative;
+        }
+
+        .stage {
+            position: absolute;
+        }
+
+        .camera-monitor {
+            position: absolute;
+            background: white;
+            border: 2px solid orange;
+            top: 70px;
+            right: 0;
+        }
+
+        .stats {
+            position: absolute;
+            right: 0;
+            top: 0;
+            padding: 5px;
+            color: whitesmoke;
+            font-family: monospace, sans-serif;
+            font-size: 11pt;
+            background: rgba(0, 0, 0, 0.7);
+
+        }
+        .stats td,td,th {
+            border: 1px solid white;
+            padding: 3px;
+            font-weight: normal;
+        }
+        .stats td {
+            color: orange;
+        }
+    </style>
+</head>
+<body>
+    <div class="stage-container">
+        <canvas class="stage" id="static-stage" width="1500" height="1000"></canvas>
+        <canvas class="stage" id="helper-stage" width="1500" height="1000"></canvas>
+        <canvas class="stage" id="dynamic-stage" width="1500" height="1000"></canvas>
+        <canvas class="stage" id="debug-stage" width="1500" height="1000"></canvas>
+    </div>
+
+    <div id="ui-mount-node"></div>
+
+    <script src="dist/ai-city-simulation.js"></script>
+    <script>
+        window.AiCitySimulation.start(document.getElementById('ui-mount-node'));
+    </script>
+</body>
+</html>
