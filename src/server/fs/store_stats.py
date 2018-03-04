@@ -27,10 +27,3 @@ def create_image(filename, imgstring):
 
 	with open(filename, 'wb') as f:
 		f.write(imgdata)
-
-
-def read_stats_from_csv(filename):
-	new_df=pd.read_csv(filename, index_col=0)
-	return new_df
-
-

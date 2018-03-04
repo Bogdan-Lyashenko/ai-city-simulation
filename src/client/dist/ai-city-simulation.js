@@ -841,10 +841,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 exports.default = {
     start: function start(mountNode) {
         (0, _UiLayer.createUiLayer)(mountNode);
-        //connection.init(); //TODO: uncomment when need socket
+        _connection2.default.init(); //TODO: uncomment when need socket
 
         var city = (0, _City.createCity)(_World2.default);
         var render = (0, _Render.createRender)(_World2.default);
+
         //TODO: moving this line breaks car rendering
         //also, it should init only if it's learning mode
         var learningDriving = (0, _Learning.setupLearningDriving)(_World2.default);

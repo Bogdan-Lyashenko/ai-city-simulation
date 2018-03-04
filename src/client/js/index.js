@@ -12,10 +12,11 @@ import { onUiEvent, EVENTS } from './ui/events';
 export default {
     start(mountNode) {
         createUiLayer(mountNode);
-        //connection.init(); //TODO: uncomment when need socket
+        connection.init(); //TODO: uncomment when need socket
 
         const city = createCity(world);
         const render = createRender(world);
+
         //TODO: moving this line breaks car rendering
         //also, it should init only if it's learning mode
         const learningDriving = setupLearningDriving(world);
