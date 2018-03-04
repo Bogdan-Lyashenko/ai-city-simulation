@@ -15,18 +15,22 @@
             position: absolute;
         }
 
-        .camera-monitor {
-            position: absolute;
-            background: white;
-            border: 2px solid orange;
-            top: 70px;
-            right: 0;
-        }
-
-        .stats {
+        .ui-controls {
             position: absolute;
             right: 0;
             top: 0;
+            text-align: right;
+        }
+
+        .camera-monitor {
+            position: absolute;
+            right: 20px;
+            top: 70px;
+            background: white;
+            border: 1px solid #111;
+        }
+
+        .stats {
             padding: 5px;
             color: whitesmoke;
             font-family: monospace, sans-serif;
@@ -41,6 +45,24 @@
         }
         .stats td {
             color: orange;
+        }
+
+        .buttons {
+            position: absolute;
+            top: 70px;
+            right: 190px;
+        }
+
+        button {
+            cursor: pointer;
+            background: #ccc;
+            font-family: monospace, sans-serif;
+            color: #111;
+            outline: none;
+            display: block;
+            width: 146px;
+            margin-bottom: 3px;
+            border: 1px solid #111;
         }
     </style>
 </head>

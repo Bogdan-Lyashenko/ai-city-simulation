@@ -8,24 +8,33 @@ const SLOW_WORLD = 250;
 
 const CAR_POSITION = { x: 200, y: 60 };
 
-export const startLearningDriving = (world, noDataSend) => {
+export const setupLearningDriving = world => {
     const learningCar = createCar(world, {
         initialPhysics: { ...CAR_POSITION }
     });
 
     const roadCamera = learningCar.accessRoadCamera();
-    const learningStatsCollector = createStatsCollector(noDataSend);
-
-    world.onTick(
-        slowDown(() => {
-            roadCamera.highlightPhotoArea();
-
-            learningStatsCollector.collect({
-                carStats: learningCar.getStatsData(),
-                roadPhoto: roadCamera.takePhoto()
-            });
-        }, SLOW_WORLD)
-    );
+    const learningStatsCollector = createStatsCollector();
 
     startDriving(learningCar);
+
+    return {
+        start() {
+            this.listenerID = world.onTick(
+                slowDown(() => {
+                    roadCamera.highlightPhotoArea();
+
+                    learningStatsCollector.collect({
+                        carStats: learningCar.getStatsData(),
+                        roadPhoto: roadCamera.takePhoto()
+                    });
+                }, SLOW_WORLD)
+            );
+        },
+
+        stop() {
+            Number.isInteger(this.listenerID) &&
+                world.removeListener(this.listenerID);
+        }
+    };
 };

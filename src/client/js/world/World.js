@@ -36,6 +36,10 @@ export const createWorld = config => {
             return listeners.length - 1;
         },
 
+        removeListener(id) {
+            listeners.splice(id, 1);
+        },
+
         addDynamicEntry(entry) {
             dynamicEntries.push(entry);
         },

@@ -834,6 +834,8 @@ var _storage = __webpack_require__(33);
 
 var _UiLayer = __webpack_require__(35);
 
+var _events = __webpack_require__(40);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = {
@@ -844,7 +846,14 @@ exports.default = {
         var city = (0, _City.createCity)(_World2.default);
         var render = (0, _Render.createRender)(_World2.default);
         //TODO: moving this line breaks car rendering
-        (0, _Learning.startLearningDriving)(_World2.default);
+        //also, it should init only if it's learning mode
+        var learningDriving = (0, _Learning.setupLearningDriving)(_World2.default);
+        (0, _events.onUiEvent)(_events.EVENTS.START_LEARN, function () {
+            return learningDriving.start();
+        });
+        (0, _events.onUiEvent)(_events.EVENTS.STOP_LEARN, function () {
+            return learningDriving.stop();
+        });
 
         var storage = (0, _storage.createStorage)();
         storage.setData(render.getInitialVisualData());
@@ -909,6 +918,9 @@ var createWorld = exports.createWorld = function createWorld(config) {
         onTick: function onTick(fn) {
             listeners.push(fn);
             return listeners.length - 1;
+        },
+        removeListener: function removeListener(id) {
+            listeners.splice(id, 1);
         },
         addDynamicEntry: function addDynamicEntry(entry) {
             dynamicEntries.push(entry);
@@ -2022,7 +2034,7 @@ module.exports = exports['default'];
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.startLearningDriving = undefined;
+exports.setupLearningDriving = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -2038,24 +2050,31 @@ var SLOW_WORLD = 250;
 
 var CAR_POSITION = { x: 200, y: 60 };
 
-var startLearningDriving = exports.startLearningDriving = function startLearningDriving(world, noDataSend) {
+var setupLearningDriving = exports.setupLearningDriving = function setupLearningDriving(world) {
     var learningCar = (0, _Car.createCar)(world, {
         initialPhysics: _extends({}, CAR_POSITION)
     });
 
     var roadCamera = learningCar.accessRoadCamera();
-    var learningStatsCollector = (0, _Stats.createStatsCollector)(noDataSend);
-
-    world.onTick((0, _animation.slowDown)(function () {
-        roadCamera.highlightPhotoArea();
-
-        learningStatsCollector.collect({
-            carStats: learningCar.getStatsData(),
-            roadPhoto: roadCamera.takePhoto()
-        });
-    }, SLOW_WORLD));
+    var learningStatsCollector = (0, _Stats.createStatsCollector)();
 
     (0, _Driving.startDriving)(learningCar);
+
+    return {
+        start: function start() {
+            this.listenerID = world.onTick((0, _animation.slowDown)(function () {
+                roadCamera.highlightPhotoArea();
+
+                learningStatsCollector.collect({
+                    carStats: learningCar.getStatsData(),
+                    roadPhoto: roadCamera.takePhoto()
+                });
+            }, SLOW_WORLD));
+        },
+        stop: function stop() {
+            Number.isInteger(this.listenerID) && world.removeListener(this.listenerID);
+        }
+    };
 };
 
 /***/ }),
@@ -2162,12 +2181,7 @@ var _actions = __webpack_require__(7);
 
 var TableModel = ['speed', 'steerAngle', 'left', 'right', 'throttle', 'brake'];
 
-var chunksSent = {
-    count: 0,
-    limit: 5
-};
-
-var createStatsCollector = exports.createStatsCollector = function createStatsCollector(noDataSend) {
+var createStatsCollector = exports.createStatsCollector = function createStatsCollector() {
     var canvasForImageTransfer = (0, _canvas.createCanvasForImageTransfer)({
         size: _constants.STATS_CONFIG.CAMERA_SIZE,
         imageType: _constants.STATS_CONFIG.IMAGE_TYPE,
@@ -2184,13 +2198,7 @@ var createStatsCollector = exports.createStatsCollector = function createStatsCo
     return {
         manageStore: function manageStore(dataRecord) {
             if (store.data.length >= store.limit) {
-                if (chunksSent.count < chunksSent.limit) {
-                    (0, _learning.sendLearningModelOneData)(store.data);
-                    chunksSent.count++;
-                } else {
-                    console.log('finish!');
-                }
-
+                (0, _learning.sendLearningModelOneData)(store.data);
                 store.data = [];
             }
 
@@ -2207,7 +2215,7 @@ var createStatsCollector = exports.createStatsCollector = function createStatsCo
             var carStats = _ref.carStats,
                 roadPhoto = _ref.roadPhoto;
 
-            !noDataSend && this.manageStore({
+            this.manageStore({
                 id: Date.now(),
                 carStats: carStats,
                 roadPhoto: _extends({}, canvasForImageTransfer.covertImageDataToBase64(roadPhoto))
@@ -2354,9 +2362,13 @@ var _Table = __webpack_require__(36);
 
 var _Canvas = __webpack_require__(37);
 
+var _EventButton = __webpack_require__(39);
+
 var _state = __webpack_require__(38);
 
 var _actions = __webpack_require__(7);
+
+var _events = __webpack_require__(40);
 
 var _constants = __webpack_require__(0);
 
@@ -2373,7 +2385,7 @@ var onCanvasUpdate = function onCanvasUpdate(el, oldAttributes, state) {
 var view = function view(state, actions) {
     return (0, _hyperapp.h)(
         'div',
-        null,
+        { className: 'ui-controls' },
         (0, _hyperapp.h)(_Table.Table, {
             className: 'stats',
             head: state.learning.stats.tableHead,
@@ -2389,7 +2401,21 @@ var view = function view(state, actions) {
             onUpdate: function onUpdate(el, oldAttr) {
                 return onCanvasUpdate(el, oldAttr, state);
             }
-        })
+        }),
+        (0, _hyperapp.h)(
+            'div',
+            { className: 'buttons' },
+            (0, _hyperapp.h)(_EventButton.EventButton, {
+                title: 'start learn',
+                eventName: _events.EVENTS.START_LEARN,
+                onClick: _events.triggerUiEvent
+            }),
+            (0, _hyperapp.h)(_EventButton.EventButton, {
+                title: 'stop learn',
+                eventName: _events.EVENTS.STOP_LEARN,
+                onClick: _events.triggerUiEvent
+            })
+        )
     );
 };
 
@@ -2509,6 +2535,64 @@ var state = exports.state = {
             imageData: null
         }
     }
+};
+
+/***/ }),
+/* 39 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.EventButton = undefined;
+
+var _hyperapp = __webpack_require__(2);
+
+var EventButton = exports.EventButton = function EventButton(_ref) {
+    var title = _ref.title,
+        eventName = _ref.eventName,
+        onClick = _ref.onClick;
+    return (0, _hyperapp.h)(
+        'button',
+        { onclick: function onclick(data) {
+                return onClick(eventName, data);
+            }, title: eventName },
+        title
+    );
+};
+
+/***/ }),
+/* 40 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.EVENTS = exports.onUiEvent = exports.triggerUiEvent = undefined;
+
+var _events = __webpack_require__(12);
+
+var publishSubscriber = (0, _events.createPublishSubscriber)();
+
+var triggerUiEvent = exports.triggerUiEvent = function triggerUiEvent(type) {
+    var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    publishSubscriber.publish(type, data);
+};
+
+var onUiEvent = exports.onUiEvent = function onUiEvent(event, fn) {
+    publishSubscriber.subscribe(event, fn);
+};
+
+var EVENTS = exports.EVENTS = {
+    START_LEARN: 'START_LEARN',
+    STOP_LEARN: 'STOP_LEARN'
 };
 
 /***/ })

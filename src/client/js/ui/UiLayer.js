@@ -1,8 +1,10 @@
 import { h, app } from 'hyperapp';
 import { Table } from './components/Table';
 import { Canvas, putImageData, clearRect } from './components/Canvas';
+import { EventButton } from './components/EventButton';
 import { state } from './state';
 import { uiActions, linkActionsCopy } from './actions';
+import { triggerUiEvent, EVENTS } from './events';
 import { STATS_CONFIG } from '../utils/constants';
 
 const SIZE = STATS_CONFIG.CAMERA_SIZE;
@@ -20,7 +22,7 @@ const onCanvasUpdate = (el, oldAttributes, state) => {
 };
 
 const view = (state, actions) => (
-    <div>
+    <div className="ui-controls">
         <Table
             className="stats"
             head={state.learning.stats.tableHead}
@@ -33,6 +35,18 @@ const view = (state, actions) => (
             onCreate={el => actions.learning.cameraMonitor.setContext(el)}
             onUpdate={(el, oldAttr) => onCanvasUpdate(el, oldAttr, state)}
         />
+        <div className="buttons">
+            <EventButton
+                title="start learn"
+                eventName={EVENTS.START_LEARN}
+                onClick={triggerUiEvent}
+            />
+            <EventButton
+                title="stop learn"
+                eventName={EVENTS.STOP_LEARN}
+                onClick={triggerUiEvent}
+            />
+        </div>
     </div>
 );
 

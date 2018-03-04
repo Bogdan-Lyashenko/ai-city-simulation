@@ -13,12 +13,7 @@ const TableModel = [
     'brake'
 ];
 
-const chunksSent = {
-    count: 0,
-    limit: 5
-};
-
-export const createStatsCollector = noDataSend => {
+export const createStatsCollector = () => {
     const canvasForImageTransfer = createCanvasForImageTransfer({
         size: STATS_CONFIG.CAMERA_SIZE,
         imageType: STATS_CONFIG.IMAGE_TYPE,
@@ -35,13 +30,7 @@ export const createStatsCollector = noDataSend => {
     return {
         manageStore(dataRecord) {
             if (store.data.length >= store.limit) {
-                if (chunksSent.count < chunksSent.limit) {
-                    sendLearningModelOneData(store.data);
-                    chunksSent.count++;
-                } else {
-                    console.log('finish!');
-                }
-
+                sendLearningModelOneData(store.data);
                 store.data = [];
             }
 
@@ -55,16 +44,13 @@ export const createStatsCollector = noDataSend => {
         },
 
         collect({ carStats, roadPhoto }) {
-            !noDataSend &&
-                this.manageStore({
-                    id: Date.now(),
-                    carStats,
-                    roadPhoto: {
-                        ...canvasForImageTransfer.covertImageDataToBase64(
-                            roadPhoto
-                        )
-                    }
-                });
+            this.manageStore({
+                id: Date.now(),
+                carStats,
+                roadPhoto: {
+                    ...canvasForImageTransfer.covertImageDataToBase64(roadPhoto)
+                }
+            });
 
             this.visualize(carStats, roadPhoto);
         }

@@ -3,10 +3,11 @@ import connection from './connection/connection';
 
 import { createCity } from './city/City';
 import { createRender } from './render/Render';
-import { startLearningDriving } from './learning/Learning';
+import { setupLearningDriving } from './learning/Learning';
 
 import { createStorage } from './utils/storage';
 import { createUiLayer } from './ui/UiLayer';
+import { onUiEvent, EVENTS } from './ui/events';
 
 export default {
     start(mountNode) {
@@ -16,7 +17,10 @@ export default {
         const city = createCity(world);
         const render = createRender(world);
         //TODO: moving this line breaks car rendering
-        startLearningDriving(world);
+        //also, it should init only if it's learning mode
+        const learningDriving = setupLearningDriving(world);
+        onUiEvent(EVENTS.START_LEARN, () => learningDriving.start());
+        onUiEvent(EVENTS.STOP_LEARN, () => learningDriving.stop());
 
         const storage = createStorage();
         storage.setData(render.getInitialVisualData());
