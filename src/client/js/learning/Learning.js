@@ -16,17 +16,16 @@ export const startLearningDriving = (world, noDataSend) => {
     const roadCamera = learningCar.accessRoadCamera();
     const learningStatsCollector = createStatsCollector(noDataSend);
 
+    world.onTick(
+        slowDown(() => {
+            roadCamera.highlightPhotoArea();
 
-        world.onTick(
-            slowDown(() => {
-                roadCamera.highlightPhotoArea();
-
-                learningStatsCollector.collect({
-                    carStats: learningCar.getStatsData(),
-                    roadPhoto: roadCamera.takePhoto()
-                });
-            }, SLOW_WORLD)
-        );
+            learningStatsCollector.collect({
+                carStats: learningCar.getStatsData(),
+                roadPhoto: roadCamera.takePhoto()
+            });
+        }, SLOW_WORLD)
+    );
 
     startDriving(learningCar);
 };

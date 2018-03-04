@@ -1,14 +1,33 @@
 import { DEVICE_TYPES } from '../../../../utils/constants';
-import { createTempCanvas,getCanvasHandlers } from '../../../../utils/canvas';
+import { createTempCanvas, getCanvasHandlers } from '../../../../utils/canvas';
+
+const addCarHeading = (
+    ctx,
+    rSideBack,
+    heading,
+    cgToRear,
+    halfWidth,
+    twoCgToRear
+) => {
+    ctx.save();
+    ctx.translate(rSideBack, rSideBack);
+    ctx.rotate(heading);
+    ctx.fillRect(-cgToRear, -halfWidth, twoCgToRear, cgToRear);
+    ctx.restore();
+};
 
 const Camera = ({ targetView, helperView, car }) => {
-    const { cgToRear, position } = car.getVisualData();
+    const { cgToRear, halfWidth, position } = car.getVisualData();
 
-    const rSideBack = 3 * cgToRear,
+    const twoCgToRear = 2 * cgToRear,
+        rSideBack = 3 * cgToRear,
         rSideForward = 2 * rSideBack;
 
     const tmpCanvas = createTempCanvas(rSideForward, rSideForward);
-    const {ctx, clear} = getCanvasHandlers(tmpCanvas)
+    const { ctx, clear } = getCanvasHandlers(tmpCanvas);
+
+    //TODO: theme
+    ctx.fillStyle = 'red';
 
     return {
         highlightPhotoArea() {
@@ -24,6 +43,7 @@ const Camera = ({ targetView, helperView, car }) => {
 
         takePhoto() {
             const { x, y } = position;
+            const { heading } = car.getCarPhysData();
 
             const imageData = targetView.getImageData(
                 x - rSideBack,
@@ -35,7 +55,16 @@ const Camera = ({ targetView, helperView, car }) => {
             clear();
             ctx.putImageData(imageData, 0, 0);
 
-            //add
+            //draw car rectangle
+            addCarHeading(
+                ctx,
+                rSideBack,
+                heading,
+                cgToRear,
+                halfWidth,
+                twoCgToRear
+            );
+
             return ctx.canvas;
         }
     };

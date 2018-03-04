@@ -32,10 +32,14 @@ export const createTempCanvas = (w = 500, h = 500) => {
     return c;
 };
 
-export const createCanvasForImageTransfer = ({ size, imageType, scale=0.5 }) => {
+export const createCanvasForImageTransfer = ({
+    size,
+    imageType,
+    scale = 0.5
+}) => {
     const scaleSize = size * scale;
     const canvasForScale = createTempCanvas(scaleSize, scaleSize);
-    const {ctx, clear} = getCanvasHandlers(canvasForScale);
+    const { ctx, clear } = getCanvasHandlers(canvasForScale);
 
     return {
         covertImageDataToBase64(img) {

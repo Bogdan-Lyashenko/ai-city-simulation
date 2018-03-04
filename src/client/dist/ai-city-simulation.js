@@ -684,12 +684,23 @@ var Car = function Car(world, state) {
         getType: function getType() {
             return state.type;
         },
-        getVisualData: function getVisualData() {
-            var scale = 12;
+        getCarPhysData: function getCarPhysData() {
             var _physicalInstance = this.physicalInstance,
-                config = _physicalInstance.config,
                 position = _physicalInstance.position,
                 heading = _physicalInstance.heading;
+
+
+            return {
+                position: position,
+                heading: heading
+            };
+        },
+        getVisualData: function getVisualData() {
+            var scale = 12;
+            var _physicalInstance2 = this.physicalInstance,
+                config = _physicalInstance2.config,
+                position = _physicalInstance2.position,
+                heading = _physicalInstance2.heading;
 
 
             return {
@@ -701,10 +712,10 @@ var Car = function Car(world, state) {
             };
         },
         getStatsData: function getStatsData() {
-            var _physicalInstance2 = this.physicalInstance,
-                velocity_c = _physicalInstance2.velocity_c,
-                steerAngle = _physicalInstance2.steerAngle,
-                inputs = _physicalInstance2.inputs;
+            var _physicalInstance3 = this.physicalInstance,
+                velocity_c = _physicalInstance3.velocity_c,
+                steerAngle = _physicalInstance3.steerAngle,
+                inputs = _physicalInstance3.inputs;
 
 
             return {
@@ -1670,6 +1681,14 @@ var _constants = __webpack_require__(0);
 
 var _canvas = __webpack_require__(1);
 
+var addCarHeading = function addCarHeading(ctx, rSideBack, heading, cgToRear, halfWidth, twoCgToRear) {
+    ctx.save();
+    ctx.translate(rSideBack, rSideBack);
+    ctx.rotate(heading);
+    ctx.fillRect(-cgToRear, -halfWidth, twoCgToRear, cgToRear);
+    ctx.restore();
+};
+
 var Camera = function Camera(_ref) {
     var targetView = _ref.targetView,
         helperView = _ref.helperView,
@@ -1677,9 +1696,11 @@ var Camera = function Camera(_ref) {
 
     var _car$getVisualData = car.getVisualData(),
         cgToRear = _car$getVisualData.cgToRear,
+        halfWidth = _car$getVisualData.halfWidth,
         position = _car$getVisualData.position;
 
-    var rSideBack = 3 * cgToRear,
+    var twoCgToRear = 2 * cgToRear,
+        rSideBack = 3 * cgToRear,
         rSideForward = 2 * rSideBack;
 
     var tmpCanvas = (0, _canvas.createTempCanvas)(rSideForward, rSideForward);
@@ -1687,6 +1708,11 @@ var Camera = function Camera(_ref) {
     var _getCanvasHandlers = (0, _canvas.getCanvasHandlers)(tmpCanvas),
         ctx = _getCanvasHandlers.ctx,
         clear = _getCanvasHandlers.clear;
+
+    //TODO: theme
+
+
+    ctx.fillStyle = 'red';
 
     return {
         highlightPhotoArea: function highlightPhotoArea() {
@@ -1700,13 +1726,17 @@ var Camera = function Camera(_ref) {
             var x = position.x,
                 y = position.y;
 
+            var _car$getCarPhysData = car.getCarPhysData(),
+                heading = _car$getCarPhysData.heading;
 
             var imageData = targetView.getImageData(x - rSideBack, y - rSideBack, rSideForward, rSideForward);
 
             clear();
             ctx.putImageData(imageData, 0, 0);
 
-            //add
+            //draw car rectangle
+            addCarHeading(ctx, rSideBack, heading, cgToRear, halfWidth, twoCgToRear);
+
             return ctx.canvas;
         }
     };
@@ -2141,7 +2171,7 @@ var createStatsCollector = exports.createStatsCollector = function createStatsCo
     var canvasForImageTransfer = (0, _canvas.createCanvasForImageTransfer)({
         size: _constants.STATS_CONFIG.CAMERA_SIZE,
         imageType: _constants.STATS_CONFIG.IMAGE_TYPE,
-        scale: 1 //STATS_CONFIG.ROAD_IMAGE_SCALE
+        scale: _constants.STATS_CONFIG.ROAD_IMAGE_SCALE
     });
 
     var store = {

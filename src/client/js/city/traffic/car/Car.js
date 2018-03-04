@@ -32,6 +32,15 @@ const Car = (world, state) => ({
         return state.type;
     },
 
+    getCarPhysData() {
+        const { position, heading } = this.physicalInstance;
+
+        return {
+            position,
+            heading
+        };
+    },
+
     getVisualData() {
         const scale = 12;
         const { config, position, heading } = this.physicalInstance;
