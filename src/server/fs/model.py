@@ -6,27 +6,19 @@ import numpy as np
 from sklearn import neighbors
 from sklearn.linear_model import LinearRegression
 
-from read_stats import read_images_from_fs
+from read_stats import get_data_for_model
 
+data = get_data_for_model()
 
-#start for learning
-ids = [
-	1,
-	2,
-	3,
-	4,
-	5,
-	6,
-	7
-]
+X = data["X"]
+y = data["y"]
 
-extra_data = []
-X = read_images_from_fs('store/road_images/', ids)
-y = [1.57, 1.3, 0.87, 0.61, 0.0, 0.09, 0.69]
+print(y[25])
+
+test = X.pop(25)
+new_y = np.delete(y, [25])
 
 model = LinearRegression()
-model.fit(X, y)
+model.fit(X, new_y)
 
-test = read_images_from_fs('store/road_images/', ['test'])
-
-print(model.predict([test[0]]))
+print(model.predict([test]))

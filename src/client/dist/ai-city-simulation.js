@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 8);
+/******/ 	return __webpack_require__(__webpack_require__.s = 10);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -564,7 +564,7 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _maintainer = __webpack_require__(11);
+var _maintainer = __webpack_require__(13);
 
 var isInit = false;
 
@@ -614,6 +614,36 @@ module.exports = exports['default'];
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+var createPublishSubscriber = exports.createPublishSubscriber = function createPublishSubscriber() {
+    var subscribersMap = {};
+
+    return {
+        publish: function publish(event, data) {
+            var subscribers = subscribersMap[event] || [];
+            subscribers.forEach(function (s) {
+                return s(data);
+            });
+        },
+        subscribe: function subscribe(event, fn) {
+            if (!subscribersMap[event]) {
+                subscribersMap[event] = [];
+            }
+
+            subscribersMap[event].push(fn);
+        }
+    };
+};
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 exports.parseReceivedData = exports.sendData = undefined;
 
 var _connection = __webpack_require__(4);
@@ -632,7 +662,7 @@ var parseReceivedData = exports.parseReceivedData = function parseReceivedData(d
 };
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -647,11 +677,11 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _constants = __webpack_require__(0);
 
-var _composition = __webpack_require__(15);
+var _composition = __webpack_require__(16);
 
-var _CarPhysics = __webpack_require__(17);
+var _CarPhysics = __webpack_require__(18);
 
-var _EquipmentBus = __webpack_require__(20);
+var _EquipmentBus = __webpack_require__(21);
 
 var DefaultCarState = {
     type: _constants.ObjectsTypeMap.CAR,
@@ -751,7 +781,7 @@ var createCar = exports.createCar = function createCar(world) {
 };
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -806,7 +836,38 @@ var setImageData = exports.setImageData = function setImageData(imageData) {
 };
 
 /***/ }),
-/* 8 */
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.EVENTS = exports.onUiEvent = exports.triggerUiEvent = undefined;
+
+var _events = __webpack_require__(5);
+
+var publishSubscriber = (0, _events.createPublishSubscriber)();
+
+var triggerUiEvent = exports.triggerUiEvent = function triggerUiEvent(type) {
+    var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    publishSubscriber.publish(type, data);
+};
+
+var onUiEvent = exports.onUiEvent = function onUiEvent(event, fn) {
+    publishSubscriber.subscribe(event, fn);
+};
+
+var EVENTS = exports.EVENTS = {
+    START_LEARN: 'START_LEARN',
+    STOP_LEARN: 'STOP_LEARN'
+};
+
+/***/ }),
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -816,7 +877,7 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _World = __webpack_require__(9);
+var _World = __webpack_require__(11);
 
 var _World2 = _interopRequireDefault(_World);
 
@@ -824,17 +885,17 @@ var _connection = __webpack_require__(4);
 
 var _connection2 = _interopRequireDefault(_connection);
 
-var _City = __webpack_require__(13);
+var _City = __webpack_require__(14);
 
-var _Render = __webpack_require__(25);
+var _Render = __webpack_require__(26);
 
-var _Learning = __webpack_require__(28);
+var _Learning = __webpack_require__(29);
 
-var _storage = __webpack_require__(33);
+var _storage = __webpack_require__(34);
 
-var _UiLayer = __webpack_require__(35);
+var _UiLayer = __webpack_require__(36);
 
-var _events = __webpack_require__(40);
+var _events = __webpack_require__(9);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -870,7 +931,7 @@ exports.default = {
 module.exports = exports['default'];
 
 /***/ }),
-/* 9 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -883,7 +944,7 @@ exports.createWorld = undefined;
 
 var _animation = __webpack_require__(3);
 
-var _View = __webpack_require__(10);
+var _View = __webpack_require__(12);
 
 var worldConfig = {
     TICK_TIME: 10 //5000
@@ -945,7 +1006,7 @@ var world = createWorld(worldConfig);
 exports.default = world;
 
 /***/ }),
-/* 10 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -998,7 +1059,7 @@ var createWorldView = exports.createWorldView = function createWorldView() {
 };
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1009,9 +1070,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.on = exports.maintain = undefined;
 
-var _events = __webpack_require__(12);
+var _events = __webpack_require__(5);
 
-var _adapter = __webpack_require__(5);
+var _adapter = __webpack_require__(6);
 
 var publishSubscriber = (0, _events.createPublishSubscriber)();
 
@@ -1031,37 +1092,7 @@ var on = exports.on = function on(event, fn) {
 };
 
 /***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-var createPublishSubscriber = exports.createPublishSubscriber = function createPublishSubscriber() {
-    var subscribersMap = {};
-
-    return {
-        publish: function publish(event, data) {
-            var subscribers = subscribersMap[event] || [];
-            subscribers.forEach(function (s) {
-                return s(data);
-            });
-        },
-        subscribe: function subscribe(event, fn) {
-            if (!subscribersMap[event]) {
-                subscribersMap[event] = [];
-            }
-
-            subscribersMap[event].push(fn);
-        }
-    };
-};
-
-/***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1074,9 +1105,9 @@ exports.createCity = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _Traffic = __webpack_require__(14);
+var _Traffic = __webpack_require__(15);
 
-var _Map = __webpack_require__(24);
+var _Map = __webpack_require__(25);
 
 var City = function City(world, state) {
     return {
@@ -1096,7 +1127,7 @@ var createCity = exports.createCity = function createCity(world) {
 };
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1109,7 +1140,7 @@ exports.createTraffic = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _Car = __webpack_require__(6);
+var _Car = __webpack_require__(7);
 
 var DefaultTrafficState = {
     cars: [],
@@ -1142,7 +1173,7 @@ var createTraffic = exports.createTraffic = function createTraffic(world) {
 };
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1153,7 +1184,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.mergeObjectStructures = undefined;
 
-var _deepmerge = __webpack_require__(16);
+var _deepmerge = __webpack_require__(17);
 
 var _deepmerge2 = _interopRequireDefault(_deepmerge);
 
@@ -1164,7 +1195,7 @@ var mergeObjectStructures = exports.mergeObjectStructures = function mergeObject
 };
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1261,7 +1292,7 @@ var deepmerge_1 = deepmerge;
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1277,9 +1308,9 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
                                                                                                                                                                                                                                                                    * https://github.com/spacejack/carphysics2d
                                                                                                                                                                                                                                                                    */
 
-var _Vec = __webpack_require__(18);
+var _Vec = __webpack_require__(19);
 
-var _GMath = __webpack_require__(19);
+var _GMath = __webpack_require__(20);
 
 var getInputState = function getInputState() {
     return {
@@ -1513,7 +1544,7 @@ var createCarPhysics = exports.createCarPhysics = function createCarPhysics(opts
 };
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1581,7 +1612,7 @@ Vec2.prototype = {
 };
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1608,7 +1639,7 @@ var GMath = exports.GMath = {
 };
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1619,11 +1650,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.createEquipmentBus = undefined;
 
-var _Camera = __webpack_require__(21);
+var _Camera = __webpack_require__(22);
 
-var _Navigator = __webpack_require__(22);
+var _Navigator = __webpack_require__(23);
 
-var _AutoPilot = __webpack_require__(23);
+var _AutoPilot = __webpack_require__(24);
 
 var EquipmentBus = function EquipmentBus(world, car) {
     var devices = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -1679,7 +1710,7 @@ var createEquipmentBus = exports.createEquipmentBus = function createEquipmentBu
 };
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1764,7 +1795,7 @@ var createCamera = exports.createCamera = function createCamera(_ref2) {
 };
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1788,7 +1819,7 @@ var createNavigator = exports.createNavigator = function createNavigator() {
 };
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1810,7 +1841,7 @@ var createAutoPilot = exports.createAutoPilot = function createAutoPilot() {
 };
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1847,7 +1878,7 @@ var createMap = exports.createMap = function createMap(world) {
 };
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1858,11 +1889,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.createRender = exports.RenderMap = undefined;
 
-var _Canvas2dRender = __webpack_require__(26);
+var _Canvas2dRender = __webpack_require__(27);
 
 var _Canvas2dRender2 = _interopRequireDefault(_Canvas2dRender);
 
-var _VisualConfig = __webpack_require__(27);
+var _VisualConfig = __webpack_require__(28);
 
 var _VisualConfig2 = _interopRequireDefault(_VisualConfig);
 
@@ -1927,7 +1958,7 @@ var createRender = exports.createRender = function createRender(world) {
 };
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1988,7 +2019,7 @@ exports.default = function (canvas, visual) {
 };
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2026,7 +2057,7 @@ exports.default = function () {
 module.exports = exports['default'];
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2041,11 +2072,11 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _animation = __webpack_require__(3);
 
-var _Driving = __webpack_require__(29);
+var _Driving = __webpack_require__(30);
 
-var _Car = __webpack_require__(6);
+var _Car = __webpack_require__(7);
 
-var _Stats = __webpack_require__(31);
+var _Stats = __webpack_require__(32);
 
 var SLOW_WORLD = 250;
 
@@ -2079,7 +2110,7 @@ var setupLearningDriving = exports.setupLearningDriving = function setupLearning
 };
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2090,7 +2121,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.stopDriving = exports.startDriving = undefined;
 
-var _Input = __webpack_require__(30);
+var _Input = __webpack_require__(31);
 
 var _Input2 = _interopRequireDefault(_Input);
 
@@ -2121,7 +2152,7 @@ var stopDriving = exports.stopDriving = function stopDriving() {
 };
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2159,7 +2190,7 @@ var input = createInput(document);
 exports.default = input;
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2176,9 +2207,9 @@ var _constants = __webpack_require__(0);
 
 var _canvas = __webpack_require__(1);
 
-var _learning = __webpack_require__(32);
+var _learning = __webpack_require__(33);
 
-var _actions = __webpack_require__(7);
+var _actions = __webpack_require__(8);
 
 var TableModel = ['speed', 'steerAngle', 'left', 'right', 'throttle', 'brake'];
 
@@ -2228,7 +2259,7 @@ var createStatsCollector = exports.createStatsCollector = function createStatsCo
 };
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2241,7 +2272,7 @@ exports.sendLearningModelOneData = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _adapter = __webpack_require__(5);
+var _adapter = __webpack_require__(6);
 
 var prepareData = function prepareData(data) {
     return {
@@ -2266,7 +2297,7 @@ var sendLearningModelOneData = exports.sendLearningModelOneData = function sendL
 };
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2277,7 +2308,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.createStorage = undefined;
 
-var _loader = __webpack_require__(34);
+var _loader = __webpack_require__(35);
 
 var _constants = __webpack_require__(0);
 
@@ -2325,7 +2356,7 @@ var createStorage = exports.createStorage = function createStorage() {
 };
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2346,7 +2377,7 @@ var loadImage = exports.loadImage = function loadImage(path) {
 };
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2359,17 +2390,17 @@ exports.createUiLayer = undefined;
 
 var _hyperapp = __webpack_require__(2);
 
-var _Table = __webpack_require__(36);
+var _Table = __webpack_require__(37);
 
-var _Canvas = __webpack_require__(37);
+var _Canvas = __webpack_require__(38);
 
 var _EventButton = __webpack_require__(39);
 
-var _state = __webpack_require__(38);
+var _state = __webpack_require__(40);
 
-var _actions = __webpack_require__(7);
+var _actions = __webpack_require__(8);
 
-var _events = __webpack_require__(40);
+var _events = __webpack_require__(9);
 
 var _constants = __webpack_require__(0);
 
@@ -2426,7 +2457,7 @@ var createUiLayer = exports.createUiLayer = function createUiLayer(node) {
 };
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2478,7 +2509,7 @@ var Table = exports.Table = function Table(_ref) {
 };
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2513,29 +2544,6 @@ var clearRect = exports.clearRect = function clearRect(ctx, size) {
 
 var putImageData = exports.putImageData = function putImageData(ctx, imageData) {
     ctx.drawImage(imageData, 0, 0);
-};
-
-/***/ }),
-/* 38 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-var state = exports.state = {
-    learning: {
-        stats: {
-            tableHead: [],
-            tableRows: []
-        },
-        cameraMonitor: {
-            context: null,
-            imageData: null
-        }
-    }
 };
 
 /***/ }),
@@ -2575,25 +2583,17 @@ var EventButton = exports.EventButton = function EventButton(_ref) {
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.EVENTS = exports.onUiEvent = exports.triggerUiEvent = undefined;
-
-var _events = __webpack_require__(12);
-
-var publishSubscriber = (0, _events.createPublishSubscriber)();
-
-var triggerUiEvent = exports.triggerUiEvent = function triggerUiEvent(type) {
-    var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-    publishSubscriber.publish(type, data);
-};
-
-var onUiEvent = exports.onUiEvent = function onUiEvent(event, fn) {
-    publishSubscriber.subscribe(event, fn);
-};
-
-var EVENTS = exports.EVENTS = {
-    START_LEARN: 'START_LEARN',
-    STOP_LEARN: 'STOP_LEARN'
+var state = exports.state = {
+    learning: {
+        stats: {
+            tableHead: [],
+            tableRows: []
+        },
+        cameraMonitor: {
+            context: null,
+            imageData: null
+        }
+    }
 };
 
 /***/ })
