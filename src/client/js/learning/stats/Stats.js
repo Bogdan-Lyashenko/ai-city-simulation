@@ -21,7 +21,7 @@ export const createStatsCollector = () => {
     });
 
     const store = {
-        limit: 20,
+        limit: 10,
         data: []
     };
 

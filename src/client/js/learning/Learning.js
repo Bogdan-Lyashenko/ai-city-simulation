@@ -3,8 +3,9 @@ import { startDriving } from './driving/Driving';
 
 import { createCar } from '../city/traffic/car/Car';
 import { createStatsCollector } from './stats/Stats';
+import { isStatsValid } from './stats/statsValidation';
 
-const SLOW_WORLD = 250;
+const SLOW_WORLD = 50;
 
 const CAR_POSITION = { x: 200, y: 60 };
 
@@ -24,10 +25,14 @@ export const setupLearningDriving = world => {
                 slowDown(() => {
                     roadCamera.highlightPhotoArea();
 
-                    learningStatsCollector.collect({
-                        carStats: learningCar.getStatsData(),
-                        roadPhoto: roadCamera.takePhoto()
-                    });
+                    const carStats = learningCar.getStatsData();
+                    if (isStatsValid(carStats)) {
+                        console.log('collect...');
+                        learningStatsCollector.collect({
+                            carStats,
+                            roadPhoto: roadCamera.takePhoto()
+                        });
+                    }
                 }, SLOW_WORLD)
             );
         },

@@ -2078,7 +2078,9 @@ var _Car = __webpack_require__(7);
 
 var _Stats = __webpack_require__(32);
 
-var SLOW_WORLD = 250;
+var _statsValidation = __webpack_require__(41);
+
+var SLOW_WORLD = 50;
 
 var CAR_POSITION = { x: 200, y: 60 };
 
@@ -2097,10 +2099,14 @@ var setupLearningDriving = exports.setupLearningDriving = function setupLearning
             this.listenerID = world.onTick((0, _animation.slowDown)(function () {
                 roadCamera.highlightPhotoArea();
 
-                learningStatsCollector.collect({
-                    carStats: learningCar.getStatsData(),
-                    roadPhoto: roadCamera.takePhoto()
-                });
+                var carStats = learningCar.getStatsData();
+                if ((0, _statsValidation.isStatsValid)(carStats)) {
+                    console.log('collect...');
+                    learningStatsCollector.collect({
+                        carStats: carStats,
+                        roadPhoto: roadCamera.takePhoto()
+                    });
+                }
             }, SLOW_WORLD));
         },
         stop: function stop() {
@@ -2221,7 +2227,7 @@ var createStatsCollector = exports.createStatsCollector = function createStatsCo
     });
 
     var store = {
-        limit: 20,
+        limit: 10,
         data: []
     };
 
@@ -2594,6 +2600,23 @@ var state = exports.state = {
             imageData: null
         }
     }
+};
+
+/***/ }),
+/* 41 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+var isStatsValid = exports.isStatsValid = function isStatsValid(_ref) {
+    var left = _ref.left,
+        right = _ref.right;
+
+    return left || right;
 };
 
 /***/ })

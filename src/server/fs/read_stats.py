@@ -15,14 +15,14 @@ def get_data_for_model(stats_csv_file=stats_csv_file_d, images_folder=images_fol
     images = read_images_from_fs(images_folder, ids)
 
     return {
-    	"X": merge_speed_to_image(stats_table["speed"].values, images),
+    	"X": images,
     	"y": stats_table["steerAngle"].values
     }
 
 def merge_speed_to_image(speeds, images):
 	list = []
 	for index in range(len(speeds)):
-		list.append([speeds[index], *images[index]])
+		list.append([*images[index]])
 	
 	return list
 
