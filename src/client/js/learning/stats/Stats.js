@@ -1,4 +1,4 @@
-import { STATS_CONFIG } from '../../utils/constants';
+import { ROAD_PHOTO_CONFIG } from '../../utils/constants';
 import { createCanvasForImageTransfer } from '../../utils/canvas';
 
 import { sendLearningModelOneData } from '../../connection/models/learning';
@@ -15,9 +15,9 @@ const TableModel = [
 
 export const createStatsCollector = () => {
     const canvasForImageTransfer = createCanvasForImageTransfer({
-        size: STATS_CONFIG.CAMERA_SIZE,
-        imageType: STATS_CONFIG.IMAGE_TYPE,
-        scale: STATS_CONFIG.ROAD_IMAGE_SCALE
+        size: ROAD_PHOTO_CONFIG.CAMERA_SIZE,
+        imageType: ROAD_PHOTO_CONFIG.IMAGE_TYPE,
+        scale: ROAD_PHOTO_CONFIG.ROAD_IMAGE_SCALE
     });
 
     const store = {

@@ -5,8 +5,6 @@ const publishSubscriber = createPublishSubscriber();
 
 export const maintain = response => {
     const { type, data } = parseReceivedData(response);
-
-    //TODO: smart handling blah-blah
     publishSubscriber.publish(type, data);
 };
 

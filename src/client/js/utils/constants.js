@@ -17,7 +17,7 @@ export const DEVICE_TYPES = {
     AUTOPILOT: 'autopilot'
 };
 
-export const STATS_CONFIG = {
+export const ROAD_PHOTO_CONFIG = {
     CAMERA_SIZE: 144,
     IMAGE_TYPE: 'image/jpeg',
     ROAD_IMAGE_SCALE: 0.5

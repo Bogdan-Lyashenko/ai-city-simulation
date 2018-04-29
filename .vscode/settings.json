@@ -1,0 +1,9 @@
+{
+    "python.linting.pylintEnabled": false,
+    "python.pythonPath": "/usr/local/bin/python3",
+    "editor.fontSize": 16,
+    "search.exclude": {
+        "**/node_modules": true,
+        "src/client/dist": true
+    }
+}

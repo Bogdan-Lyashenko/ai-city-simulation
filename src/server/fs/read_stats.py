@@ -10,19 +10,18 @@ images_folder_d = 'store/road_images/'
 
 def get_data_for_model(stats_csv_file=stats_csv_file_d, images_folder=images_folder_d):
     stats_table = read_stats_from_csv(stats_csv_file)
-    
-    ids = stats_table['id']
+    ids = stats_table["id"]
     images = read_images_from_fs(images_folder, ids)
 
     return {
     	"X": images,
-    	"y": stats_table["steerAngle"].values
+    	"y": stats_table["steering"].values
     }
 
 def merge_speed_to_image(speeds, images):
 	list = []
 	for index in range(len(speeds)):
-		list.append([*images[index]])
+		list.append([speeds[index], *images[index]])
 	
 	return list
 

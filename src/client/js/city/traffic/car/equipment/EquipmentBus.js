@@ -1,10 +1,14 @@
 import { createCamera } from './Camera';
 import { createNavigator } from './Navigator';
-import { createAutoPilot } from './AutoPilot';
+import { createAutoPilot } from './auto-pilot/AutoPilot';
 
 const EquipmentBus = (world, car, devices = {}) => ({
     accessCar() {
         return car;
+    },
+
+    getAutoPilot() {
+        return devices.autoPilot;
     },
 
     getRoadCamera() {
@@ -36,7 +40,7 @@ const EquipmentBus = (world, car, devices = {}) => ({
         });
 
         this.connectDevice({
-            type: 'autopilot',
+            type: 'autoPilot',
             device: createAutoPilot({
                 equipmentBus
             })

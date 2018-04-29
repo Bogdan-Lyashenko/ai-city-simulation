@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 10);
+/******/ 	return __webpack_require__(__webpack_require__.s = 11);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -102,7 +102,7 @@ var DEVICE_TYPES = exports.DEVICE_TYPES = {
     AUTOPILOT: 'autopilot'
 };
 
-var STATS_CONFIG = exports.STATS_CONFIG = {
+var ROAD_PHOTO_CONFIG = exports.ROAD_PHOTO_CONFIG = {
     CAMERA_SIZE: 144,
     IMAGE_TYPE: 'image/jpeg',
     ROAD_IMAGE_SCALE: 0.5
@@ -563,8 +563,35 @@ var slowDown = exports.slowDown = function slowDown(fn) {
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.parseReceivedData = exports.sendData = undefined;
 
-var _maintainer = __webpack_require__(13);
+var _connection = __webpack_require__(5);
+
+var _connection2 = _interopRequireDefault(_connection);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var sendData = exports.sendData = function sendData(type, data) {
+    var json = JSON.stringify({ type: type, data: data });
+    return _connection2.default.sendMessage(json);
+};
+
+var parseReceivedData = exports.parseReceivedData = function parseReceivedData(data) {
+    return JSON.parse(data);
+};
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _maintainer = __webpack_require__(6);
 
 var isInit = false;
 
@@ -605,7 +632,37 @@ exports.default = connection;
 module.exports = exports['default'];
 
 /***/ }),
-/* 5 */
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.on = exports.maintain = undefined;
+
+var _events = __webpack_require__(7);
+
+var _adapter = __webpack_require__(4);
+
+var publishSubscriber = (0, _events.createPublishSubscriber)();
+
+var maintain = exports.maintain = function maintain(response) {
+    var _parseReceivedData = (0, _adapter.parseReceivedData)(response),
+        type = _parseReceivedData.type,
+        data = _parseReceivedData.data;
+
+    publishSubscriber.publish(type, data);
+};
+
+var on = exports.on = function on(event, fn) {
+    publishSubscriber.subscribe(event, fn);
+};
+
+/***/ }),
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -635,34 +692,7 @@ var createPublishSubscriber = exports.createPublishSubscriber = function createP
 };
 
 /***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.parseReceivedData = exports.sendData = undefined;
-
-var _connection = __webpack_require__(4);
-
-var _connection2 = _interopRequireDefault(_connection);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var sendData = exports.sendData = function sendData(type, data) {
-    var json = JSON.stringify({ type: type, data: data });
-    return _connection2.default.sendMessage(json);
-};
-
-var parseReceivedData = exports.parseReceivedData = function parseReceivedData(data) {
-    return JSON.parse(data);
-};
-
-/***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -676,6 +706,8 @@ exports.createCar = undefined;
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _constants = __webpack_require__(0);
+
+var _animation = __webpack_require__(3);
 
 var _composition = __webpack_require__(16);
 
@@ -705,8 +737,15 @@ var Car = function Car(world, state) {
 
             world.addDynamicEntry(this);
             world.onTick(function (ts) {
-                return _this.onTick(ts);
+                return _this.physicalInstance.update(ts, 2, 0.6);
             });
+
+            var autoPilot = this.equipmentBus.getAutoPilot();
+            world.onTick((0, _animation.slowDown)(function () {
+                if (state.autoPilotEnabled) {
+                    autoPilot.drive();
+                }
+            }, 50));
         },
         hasVisualView: function hasVisualView() {
             return state.isVisible;
@@ -758,9 +797,6 @@ var Car = function Car(world, state) {
                 brake: inputs.brake
             };
         },
-        onTick: function onTick(ts) {
-            this.physicalInstance.update(ts, 2, 0.6);
-        },
         setDrivingInput: function setDrivingInput(input) {
             return this.physicalInstance.setInput(input);
         },
@@ -781,7 +817,7 @@ var createCar = exports.createCar = function createCar(world) {
 };
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -836,7 +872,7 @@ var setImageData = exports.setImageData = function setImageData(imageData) {
 };
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -847,7 +883,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.EVENTS = exports.onUiEvent = exports.triggerUiEvent = undefined;
 
-var _events = __webpack_require__(5);
+var _events = __webpack_require__(7);
 
 var publishSubscriber = (0, _events.createPublishSubscriber)();
 
@@ -867,7 +903,7 @@ var EVENTS = exports.EVENTS = {
 };
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -877,25 +913,25 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _World = __webpack_require__(11);
+var _World = __webpack_require__(12);
 
 var _World2 = _interopRequireDefault(_World);
 
-var _connection = __webpack_require__(4);
+var _connection = __webpack_require__(5);
 
 var _connection2 = _interopRequireDefault(_connection);
 
 var _City = __webpack_require__(14);
 
-var _Render = __webpack_require__(26);
+var _Render = __webpack_require__(28);
 
-var _Learning = __webpack_require__(29);
+var _Learning = __webpack_require__(31);
 
-var _storage = __webpack_require__(34);
+var _storage = __webpack_require__(37);
 
-var _UiLayer = __webpack_require__(36);
+var _UiLayer = __webpack_require__(39);
 
-var _events = __webpack_require__(9);
+var _events = __webpack_require__(10);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -909,7 +945,10 @@ exports.default = {
 
         //TODO: moving this line breaks car rendering
         //also, it should init only if it's learning mode
+
+        //const learningDriving = setupTestDriving(world);
         var learningDriving = (0, _Learning.setupLearningDriving)(_World2.default);
+
         (0, _events.onUiEvent)(_events.EVENTS.START_LEARN, function () {
             return learningDriving.start();
         });
@@ -931,7 +970,7 @@ exports.default = {
 module.exports = exports['default'];
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -944,7 +983,7 @@ exports.createWorld = undefined;
 
 var _animation = __webpack_require__(3);
 
-var _View = __webpack_require__(12);
+var _View = __webpack_require__(13);
 
 var worldConfig = {
     TICK_TIME: 10 //5000
@@ -1006,7 +1045,7 @@ var world = createWorld(worldConfig);
 exports.default = world;
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1059,39 +1098,6 @@ var createWorldView = exports.createWorldView = function createWorldView() {
 };
 
 /***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.on = exports.maintain = undefined;
-
-var _events = __webpack_require__(5);
-
-var _adapter = __webpack_require__(6);
-
-var publishSubscriber = (0, _events.createPublishSubscriber)();
-
-var maintain = exports.maintain = function maintain(response) {
-    var _parseReceivedData = (0, _adapter.parseReceivedData)(response),
-        type = _parseReceivedData.type,
-        data = _parseReceivedData.data;
-
-    //TODO: smart handling blah-blah
-
-
-    publishSubscriber.publish(type, data);
-};
-
-var on = exports.on = function on(event, fn) {
-    publishSubscriber.subscribe(event, fn);
-};
-
-/***/ }),
 /* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1107,7 +1113,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _Traffic = __webpack_require__(15);
 
-var _Map = __webpack_require__(25);
+var _Map = __webpack_require__(27);
 
 var City = function City(world, state) {
     return {
@@ -1140,7 +1146,7 @@ exports.createTraffic = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _Car = __webpack_require__(7);
+var _Car = __webpack_require__(8);
 
 var DefaultTrafficState = {
     cars: [],
@@ -1662,6 +1668,9 @@ var EquipmentBus = function EquipmentBus(world, car) {
         accessCar: function accessCar() {
             return car;
         },
+        getAutoPilot: function getAutoPilot() {
+            return devices.autoPilot;
+        },
         getRoadCamera: function getRoadCamera() {
             return devices.roadCamera;
         },
@@ -1692,7 +1701,7 @@ var EquipmentBus = function EquipmentBus(world, car) {
             });
 
             this.connectDevice({
-                type: 'autopilot',
+                type: 'autoPilot',
                 device: (0, _AutoPilot.createAutoPilot)({
                     equipmentBus: equipmentBus
                 })
@@ -1832,16 +1841,128 @@ exports.createAutoPilot = undefined;
 
 var _constants = __webpack_require__(0);
 
-var createAutoPilot = exports.createAutoPilot = function createAutoPilot() {
+var _helper = __webpack_require__(25);
+
+var createAutoPilot = exports.createAutoPilot = function createAutoPilot(_ref) {
+    var equipmentBus = _ref.equipmentBus;
+
     var state = {};
 
     return {
-        type: _constants.DEVICE_TYPES.AUTOPILOT
+        type: _constants.DEVICE_TYPES.AUTOPILOT,
+
+        drive: function drive() {
+            var _this = this;
+
+            this.grab().then(function (info) {
+                return _this.decide(info);
+            }).then(function (inputs) {
+                return _this.applyToInputs(inputs);
+            });
+        },
+        grab: function grab() {
+            var roadCamera = equipmentBus.getRoadCamera();
+
+            var photo = roadCamera.takePhoto();
+            return (0, _helper.predictSteering)(photo).then(function (steering) {
+                return { steering: steering };
+            });
+        },
+        decide: function decide(info) {
+            var steering = info.steering;
+
+            var STEERING_MAP = {
+                LEFT: 'L',
+                RIGHT: 'R',
+                NONE: 'N'
+            };
+
+            return {
+                right: steering === STEERING_MAP.RIGHT ? 1 : 0,
+                left: steering === STEERING_MAP.LEFT ? 1 : 0
+            };
+        },
+        applyToInputs: function applyToInputs(inputs) {
+            equipmentBus.accessCar().setDrivingInput(inputs);
+        }
     };
 };
 
 /***/ }),
 /* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.predictSteering = undefined;
+
+var _canvas = __webpack_require__(1);
+
+var _constants = __webpack_require__(0);
+
+var _predicting = __webpack_require__(26);
+
+var canvasForImageTransfer = (0, _canvas.createCanvasForImageTransfer)({
+    size: _constants.ROAD_PHOTO_CONFIG.CAMERA_SIZE,
+    imageType: _constants.ROAD_PHOTO_CONFIG.IMAGE_TYPE,
+    scale: _constants.ROAD_PHOTO_CONFIG.ROAD_IMAGE_SCALE
+});
+
+var predictSteering = exports.predictSteering = function predictSteering(roadPhoto) {
+    var data = canvasForImageTransfer.covertImageDataToBase64(roadPhoto);
+
+    return (0, _predicting.predictSteeringByRoadPhoto)(data.image);
+};
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.predictSteeringByRoadPhoto = undefined;
+
+var _adapter = __webpack_require__(4);
+
+var _maintainer = __webpack_require__(6);
+
+var waitForResponse = {};
+
+(0, _maintainer.on)('was_predicted_by_model_one', function (_ref) {
+    var steering = _ref.steering,
+        id = _ref.id;
+
+    if (id === waitForResponse.id) {
+        return waitForResponse.resolve(steering);
+    }
+
+    waitForResponse.reject();
+    console.log('MISMATCH');
+});
+
+var predictSteeringByRoadPhoto = exports.predictSteeringByRoadPhoto = function predictSteeringByRoadPhoto(image) {
+    var id = Date.now();
+
+    (0, _adapter.sendData)('predict_by_model_one', {
+        id: id,
+        image: image
+    });
+
+    return new Promise(function (resolve, reject) {
+        waitForResponse = { resolve: resolve, reject: reject, id: id };
+    });
+};
+
+/***/ }),
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1878,7 +1999,7 @@ var createMap = exports.createMap = function createMap(world) {
 };
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1889,11 +2010,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.createRender = exports.RenderMap = undefined;
 
-var _Canvas2dRender = __webpack_require__(27);
+var _Canvas2dRender = __webpack_require__(29);
 
 var _Canvas2dRender2 = _interopRequireDefault(_Canvas2dRender);
 
-var _VisualConfig = __webpack_require__(28);
+var _VisualConfig = __webpack_require__(30);
 
 var _VisualConfig2 = _interopRequireDefault(_VisualConfig);
 
@@ -1958,7 +2079,7 @@ var createRender = exports.createRender = function createRender(world) {
 };
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2019,7 +2140,7 @@ exports.default = function (canvas, visual) {
 };
 
 /***/ }),
-/* 28 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2057,7 +2178,7 @@ exports.default = function () {
 module.exports = exports['default'];
 
 /***/ }),
-/* 29 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2066,23 +2187,46 @@ module.exports = exports['default'];
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.setupLearningDriving = undefined;
+exports.setupLearningDriving = exports.setupTestDriving = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _animation = __webpack_require__(3);
 
-var _Driving = __webpack_require__(30);
+var _Driving = __webpack_require__(32);
 
-var _Car = __webpack_require__(7);
+var _Car = __webpack_require__(8);
 
-var _Stats = __webpack_require__(32);
+var _Stats = __webpack_require__(34);
 
-var _statsValidation = __webpack_require__(41);
+var _statsValidation = __webpack_require__(36);
 
 var SLOW_WORLD = 50;
 
-var CAR_POSITION = { x: 200, y: 60 };
+var CAR_POSITION = { x: 200, y: 25 };
+
+var setupTestDriving = exports.setupTestDriving = function setupTestDriving(world) {
+    var learningCar = (0, _Car.createCar)(world, {
+        autoPilotEnabled: true,
+        initialPhysics: _extends({}, CAR_POSITION)
+    });
+
+    var roadCamera = learningCar.accessRoadCamera();
+    var learningStatsCollector = (0, _Stats.createStatsCollector)();
+
+    (0, _Driving.startDriving)(learningCar);
+
+    return {
+        start: function start() {
+            this.listenerID = world.onTick((0, _animation.slowDown)(function () {
+                learningStatsCollector.visualize(learningCar.getStatsData(), roadCamera.takePhoto());
+            }, 10));
+        },
+        stop: function stop() {
+            Number.isInteger(this.listenerID) && world.removeListener(this.listenerID);
+        }
+    };
+};
 
 var setupLearningDriving = exports.setupLearningDriving = function setupLearningDriving(world) {
     var learningCar = (0, _Car.createCar)(world, {
@@ -2116,7 +2260,7 @@ var setupLearningDriving = exports.setupLearningDriving = function setupLearning
 };
 
 /***/ }),
-/* 30 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2127,7 +2271,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.stopDriving = exports.startDriving = undefined;
 
-var _Input = __webpack_require__(31);
+var _Input = __webpack_require__(33);
 
 var _Input2 = _interopRequireDefault(_Input);
 
@@ -2158,7 +2302,7 @@ var stopDriving = exports.stopDriving = function stopDriving() {
 };
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2196,7 +2340,7 @@ var input = createInput(document);
 exports.default = input;
 
 /***/ }),
-/* 32 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2213,17 +2357,17 @@ var _constants = __webpack_require__(0);
 
 var _canvas = __webpack_require__(1);
 
-var _learning = __webpack_require__(33);
+var _learning = __webpack_require__(35);
 
-var _actions = __webpack_require__(8);
+var _actions = __webpack_require__(9);
 
 var TableModel = ['speed', 'steerAngle', 'left', 'right', 'throttle', 'brake'];
 
 var createStatsCollector = exports.createStatsCollector = function createStatsCollector() {
     var canvasForImageTransfer = (0, _canvas.createCanvasForImageTransfer)({
-        size: _constants.STATS_CONFIG.CAMERA_SIZE,
-        imageType: _constants.STATS_CONFIG.IMAGE_TYPE,
-        scale: _constants.STATS_CONFIG.ROAD_IMAGE_SCALE
+        size: _constants.ROAD_PHOTO_CONFIG.CAMERA_SIZE,
+        imageType: _constants.ROAD_PHOTO_CONFIG.IMAGE_TYPE,
+        scale: _constants.ROAD_PHOTO_CONFIG.ROAD_IMAGE_SCALE
     });
 
     var store = {
@@ -2265,7 +2409,7 @@ var createStatsCollector = exports.createStatsCollector = function createStatsCo
 };
 
 /***/ }),
-/* 33 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2276,16 +2420,30 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.sendLearningModelOneData = undefined;
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _adapter = __webpack_require__(4);
 
-var _adapter = __webpack_require__(6);
+var STEERING_MAP = {
+    LEFT: 'L',
+    RIGHT: 'R',
+    NONE: 'N'
+};
+
+var getSteeringLabel = function getSteeringLabel(carStats) {
+    if (carStats.left) return STEERING_MAP.LEFT;
+    if (carStats.right) return STEERING_MAP.RIGHT;
+    return STEERING_MAP.NONE;
+};
 
 var prepareData = function prepareData(data) {
     return {
         stats: data.map(function (_ref) {
             var id = _ref.id,
                 carStats = _ref.carStats;
-            return _extends({ id: id }, carStats);
+            return {
+                i: id,
+                id: id,
+                steering: getSteeringLabel(carStats)
+            };
         }),
         images: data.map(function (_ref2) {
             var id = _ref2.id,
@@ -2303,7 +2461,24 @@ var sendLearningModelOneData = exports.sendLearningModelOneData = function sendL
 };
 
 /***/ }),
-/* 34 */
+/* 36 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+var isStatsValid = exports.isStatsValid = function isStatsValid(_ref) {
+    var left = _ref.left,
+        right = _ref.right;
+
+    return true; //left || right;
+};
+
+/***/ }),
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2314,7 +2489,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.createStorage = undefined;
 
-var _loader = __webpack_require__(35);
+var _loader = __webpack_require__(38);
 
 var _constants = __webpack_require__(0);
 
@@ -2362,7 +2537,7 @@ var createStorage = exports.createStorage = function createStorage() {
 };
 
 /***/ }),
-/* 35 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2383,7 +2558,7 @@ var loadImage = exports.loadImage = function loadImage(path) {
 };
 
 /***/ }),
-/* 36 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2396,21 +2571,21 @@ exports.createUiLayer = undefined;
 
 var _hyperapp = __webpack_require__(2);
 
-var _Table = __webpack_require__(37);
+var _Table = __webpack_require__(40);
 
-var _Canvas = __webpack_require__(38);
+var _Canvas = __webpack_require__(41);
 
-var _EventButton = __webpack_require__(39);
+var _EventButton = __webpack_require__(42);
 
-var _state = __webpack_require__(40);
+var _state = __webpack_require__(43);
 
-var _actions = __webpack_require__(8);
+var _actions = __webpack_require__(9);
 
-var _events = __webpack_require__(9);
+var _events = __webpack_require__(10);
 
 var _constants = __webpack_require__(0);
 
-var SIZE = _constants.STATS_CONFIG.CAMERA_SIZE;
+var SIZE = _constants.ROAD_PHOTO_CONFIG.CAMERA_SIZE;
 
 var onCanvasUpdate = function onCanvasUpdate(el, oldAttributes, state) {
     var subState = state.learning.cameraMonitor;
@@ -2463,7 +2638,7 @@ var createUiLayer = exports.createUiLayer = function createUiLayer(node) {
 };
 
 /***/ }),
-/* 37 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2515,7 +2690,7 @@ var Table = exports.Table = function Table(_ref) {
 };
 
 /***/ }),
-/* 38 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2553,7 +2728,7 @@ var putImageData = exports.putImageData = function putImageData(ctx, imageData) 
 };
 
 /***/ }),
-/* 39 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2580,7 +2755,7 @@ var EventButton = exports.EventButton = function EventButton(_ref) {
 };
 
 /***/ }),
-/* 40 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2600,23 +2775,6 @@ var state = exports.state = {
             imageData: null
         }
     }
-};
-
-/***/ }),
-/* 41 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-var isStatsValid = exports.isStatsValid = function isStatsValid(_ref) {
-    var left = _ref.left,
-        right = _ref.right;
-
-    return left || right;
 };
 
 /***/ })

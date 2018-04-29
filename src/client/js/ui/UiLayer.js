@@ -5,9 +5,9 @@ import { EventButton } from './components/EventButton';
 import { state } from './state';
 import { uiActions, linkActionsCopy } from './actions';
 import { triggerUiEvent, EVENTS } from './events';
-import { STATS_CONFIG } from '../utils/constants';
+import { ROAD_PHOTO_CONFIG } from '../utils/constants';
 
-const SIZE = STATS_CONFIG.CAMERA_SIZE;
+const SIZE = ROAD_PHOTO_CONFIG.CAMERA_SIZE;
 
 const onCanvasUpdate = (el, oldAttributes, state) => {
     const subState = state.learning.cameraMonitor;

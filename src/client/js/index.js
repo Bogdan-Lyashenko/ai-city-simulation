@@ -3,7 +3,7 @@ import connection from './connection/connection';
 
 import { createCity } from './city/City';
 import { createRender } from './render/Render';
-import { setupLearningDriving } from './learning/Learning';
+import { setupLearningDriving, setupTestDriving } from './learning/Learning';
 
 import { createStorage } from './utils/storage';
 import { createUiLayer } from './ui/UiLayer';
@@ -19,7 +19,10 @@ export default {
 
         //TODO: moving this line breaks car rendering
         //also, it should init only if it's learning mode
+
+        //const learningDriving = setupTestDriving(world);
         const learningDriving = setupLearningDriving(world);
+
         onUiEvent(EVENTS.START_LEARN, () => learningDriving.start());
         onUiEvent(EVENTS.STOP_LEARN, () => learningDriving.stop());
 

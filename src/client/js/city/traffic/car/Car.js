@@ -1,4 +1,5 @@
 import { ObjectsTypeMap } from '../../../utils/constants';
+import { slowDown } from '../../../utils/animation';
 import { mergeObjectStructures } from '../../../utils/composition';
 import { createCarPhysics } from './physics/CarPhysics';
 import { createEquipmentBus } from './equipment/EquipmentBus';
@@ -21,7 +22,16 @@ const Car = (world, state) => ({
         this.equipmentBus = createEquipmentBus(world, this);
 
         world.addDynamicEntry(this);
-        world.onTick(ts => this.onTick(ts));
+        world.onTick(ts => this.physicalInstance.update(ts, 2, 0.6));
+
+        const autoPilot = this.equipmentBus.getAutoPilot();
+        world.onTick(
+            slowDown(() => {
+                if (state.autoPilotEnabled) {
+                    autoPilot.drive();
+                }
+            }, 50)
+        );
     },
 
     hasVisualView() {
@@ -66,10 +76,6 @@ const Car = (world, state) => ({
             throttle: inputs.throttle,
             brake: inputs.brake
         };
-    },
-
-    onTick(ts) {
-        this.physicalInstance.update(ts, 2, 0.6);
     },
 
     setDrivingInput(input) {

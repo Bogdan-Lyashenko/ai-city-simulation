@@ -4,12 +4,13 @@ warnings.filterwarnings(action="ignore", module="scipy", message="^internal gels
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.externals import joblib
+from sklearn import neighbors
 
 def train_model(data, file):
 	X = data["X"]
 	y = data["y"]
 
-	model = LinearRegression()
+	model = neighbors.KNeighborsClassifier(n_neighbors=3)
 	model.fit(X, y)
 	joblib.dump(model, file)
 
